@@ -1,0 +1,14 @@
+{
+  "name": "stake",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "yarn hardhat test"
+  },
+  "author": "Raskolnikofff",
+  "license": "ISC",
+  "devDependencies": {
+    "hardhat": "^2.6.4"
+  }
+}
