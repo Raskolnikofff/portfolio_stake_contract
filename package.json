@@ -4,11 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "yarn hardhat test"
+    "test": "yarn hardhat test",
+    "lint": "prettier --write 'contracts/**/*.sol'"
   },
   "author": "Raskolnikofff",
   "license": "ISC",
   "devDependencies": {
-    "hardhat": "^2.6.4"
+    "hardhat": "^2.6.4",
+    "prettier": "^2.4.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.18"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.2"
   }
 }
