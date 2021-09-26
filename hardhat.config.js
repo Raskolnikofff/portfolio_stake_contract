@@ -1,6 +1,6 @@
 require('hardhat-deploy');
 require("@nomiclabs/hardhat-waffle");
-accounts={mnemonic:process.env.MNEMONIC}
+accounts={mnemonic:process.env.MNEMONIC ||""}
 
 module.exports = {
   networks: {
