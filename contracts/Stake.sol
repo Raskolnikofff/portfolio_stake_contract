@@ -96,11 +96,9 @@ contract Stake is AccessControl {
         require(block.timestamp > claimTime, "withdrawUnusedRewards: claimTime not passed");
         require(!userDeposit[msg.sender].isRewarded, "withdrawRewards: reward already been withdrawn");
         uint256 countNoDeposit;
-        bool isWithdrawAllPeriod;
-        uint256 periodTotal;
+        bool isWithdrawAllPeriod = true;
         for (uint256 i; i < periodsNumber; i++) {
             if (period[i].total != 0) {
-                periodTotal = period[i].total;
                 isWithdrawAllPeriod = false;
             } else {
                 if (period[i].isWithdrawAll) {
@@ -120,43 +118,72 @@ contract Stake is AccessControl {
         uint256 userReward;
         bool isWithdrawAllPeriod;
         uint256 periodTotal;
+        uint256 BPT;
+        bool isWithdrawAll;
         for (uint256 i; i < periodsNumber; i++) {
+            uint256 amount = periodUser[i][_account].total;
             if (period[i].total != 0) {
                 periodTotal = period[i].total;
                 isWithdrawAllPeriod = false;
-                userReward += _calc(_account, i);
+                if (amount != 0) {
+                    BPT = amount;
+                    isWithdrawAll = false;
+                    userReward += ((amountRewards / periodsNumber) * BPT) / periodTotal;
+                } else {
+                    if (periodUser[i][_account].isWithdrawAll) {
+                        isWithdrawAll = true;
+                    }
+                    if (!isWithdrawAll && BPT != 0) {
+                        userReward += ((amountRewards / periodsNumber) * BPT) / periodTotal;
+                    }
+                }
             } else {
                 if (period[i].isWithdrawAll) {
                     isWithdrawAllPeriod = true;
                 }
                 if (!isWithdrawAllPeriod && periodTotal != 0) {
-                    userReward += _calc(_account, i);
+                    if (amount != 0) {
+                        BPT = amount;
+                        isWithdrawAll = false;
+                        userReward += ((amountRewards / periodsNumber) * BPT) / periodTotal;
+                    } else {
+                        if (periodUser[i][_account].isWithdrawAll) {
+                            isWithdrawAll = true;
+                        }
+                        if (!isWithdrawAll && BPT != 0) {
+                            userReward += ((amountRewards / periodsNumber) * BPT) / periodTotal;
+                        }
+                    }
                 }
             }
         }
         return userReward;
     }
 
-    function _calc(address _account, uint256 i) internal view returns (uint256) {
-        uint256 userReward;
-        bool isWithdrawAll;
-        uint256 BPT;
-        uint256 periodTotal;
-        uint256 amount = periodUser[i][_account].total;
-        if (amount != 0) {
-            BPT = amount;
-            isWithdrawAll = false;
-            userReward += ((amountRewards / periodsNumber) * BPT) / periodTotal;
-        } else {
-            if (periodUser[i][_account].isWithdrawAll) {
-                isWithdrawAll = true;
-            }
-            if (!isWithdrawAll && BPT != 0) {
-                userReward += ((amountRewards / periodsNumber) * BPT) / periodTotal;
-            }
-        }
-        return userReward;
-    }
+    // TODO:make a function to avoid repeating the code in _rewardCalc
+    // function _calc(
+    //     address _account,
+    //     uint256 i,
+    //     uint256 periodTotal
+    // ) internal view returns (uint256) {
+    //     uint256 userReward;
+    //     bool isWithdrawAll;
+    //     uint256 BPT;
+    //     uint256 amount = periodUser[i][_account].total;
+    //     if (amount != 0) {
+    //         BPT = amount;
+    //         isWithdrawAll = false;
+    //         userReward += ((amountRewards / periodsNumber) * BPT) / periodTotal;
+    //     } else {
+    //         if (periodUser[i][_account].isWithdrawAll) {
+    //             isWithdrawAll = true;
+    //         }
+    //         if (!isWithdrawAll && BPT != 0) {
+    //             userReward += ((amountRewards / periodsNumber) * BPT) / periodTotal;
+    //         }
+    //     }
+    //     return userReward;
+    // }
 
     function totalDepositTokens() external view returns (uint256) {
         uint256 periodNumber = currentPeriodNumber() > periodsNumber ? periodsNumber : currentPeriodNumber();
